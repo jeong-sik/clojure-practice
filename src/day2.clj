@@ -9,20 +9,22 @@
 (map (fn [item] (count item)) items)
 
 (map str items)
-(defn inspect [v] (reduce (fn [acc k]
-               (if (contains? acc k)
-                 (assoc acc k (+ (get acc k) 1))
-                 (assoc acc k 1)
-                 ))
-             {}
-        v))
+
+
+
+(defn inspect [v]
+  (reduce (fn [acc k]
+            (update acc k (fnil inc 1))
+            )
+          {}
+          v))
 ;same frequencies fn
 
 (count (filter (fn [[k v]] (= v 2)) (filter (fn [[k v]] (< 1 v)) (mapcat inspect items))))
 (count (filter (fn [[k v]] (= v 3)) (filter (fn [[k v]] (< 1 v)) (mapcat inspect items))))
 
 
-(defn cf [input] (filter (fn [[_ v]] (= 2 v) ) input))
+(defn cf [input] (filter (fn [[_ v]] (= 2 v)) input))
 ;3 or 2
 (count
   (filter
@@ -37,6 +39,8 @@
 
 
 ;part 2
+(diff [1 2 3 4 5] [1 2 3 0 5])
+
 (defn diff-result [x y] (last (diff x y)))
 
 (def a (reduce
@@ -45,15 +49,17 @@
            ) v-items))
 
 (def b (remove nil? a))
-(filter (fn [c] (= 25 (count c) ))b)
+(filter (fn [c] (= 25 (count c))) b)
+(->> b
+     (remove seq?))
 
-(str/join
-  (get
-    (vec
-      (set
-        (filter
-          (fn [x] (= 25 (count x)))
-          (filter seq? b)))) 0))
+(->> b
+     (filter seq?)
+     (filter (fn [x] (= 25 (count x))))
+     set
+     vec
+     first
+     (apply str))
 ;result
 ;lujnogabetpmsydyfcovzixaw
 
