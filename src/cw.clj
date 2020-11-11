@@ -126,3 +126,21 @@
 (reduce (fn [left right] (if (odd-both left right) (+ left right) (reduced? [1]))) test1)
 (reduce (fn [a v] (if (< a 100) (+ a v) (reduced   :big))) (range 10))
 
+
+
+;https://www.codewars.com/kata/515de9ae9dcfc28eb6000001/solutions/clojure
+;my
+(defn conv [str] (let [v (vec str)]
+                   (if (= 2 (count v))
+                     (apply format "%c%c" v)
+                     (apply format "%c_" v)))
+  )
+(defn split-two [str]
+  (map conv (partition-all 2 2 str)))
+
+(split-two "cdabefg")
+
+;better
+(map clojure.string/join (partition 2 2 "_" "abcde"))
+
+
