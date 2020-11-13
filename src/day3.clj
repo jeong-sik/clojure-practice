@@ -21,32 +21,76 @@
              :range     (vec (vecToInt
                                (str/split (get i 3) #"x")))}) parsed-map))
 
-(defn fill-axis [start-pos ranges]
+(defn fill-axis [start-pos ranges key]
   (let [start-x (get start-pos 0)
         start-y (get start-pos 1)]
     (for [x (range (get ranges 0))
           y (range (get ranges 1))
           ]
-      {(str (+ start-x x) "," (+ start-y y)) 1})
+      {(str (+ start-x x) "," (+ start-y y))
+       {:count 1 :pos key :total (* (get ranges 0) (get ranges 1))}})
     ))
-;(reduce conj (vec (fill-axis [200 200] [2 2])))
+(defn conv [p r k] (reduce conj (vec (fill-axis p r k))))
 
-(defn conv [p r] (reduce conj (vec (fill-axis p r))))
-;(conv [200 200] [2 2])
+
 
 ;part3
-(count (filter
-         (fn [[k v]] (< 1 v))
-         (reduce (fn [acc
-                      {:keys [:key
-                              :start-pos
-                              :range]}]
-                   (merge-with + acc (conv start-pos range)))
-                 ;(reduce conj (vec (fill-axis start-pos range))))
-                 {} converted)))
-;120419
 
-;(reduce
-;  (fn [acc {:keys [:value :key]}] value)
-;  [{:key "a" :value 1}, {:key "b" :value 2}]
-;  )
+;120419
+(def part-1 (vec (filter
+                   (fn [[k {:keys [:count :pos]}]] (< 1 count))
+                   (reduce (fn [acc
+                                {:keys [:key
+                                        :start-pos
+                                        :range]}]
+                             (merge-with
+                               (fn
+                                 [x
+                                  {:keys
+                                   [:pos :count]}]
+                                 {:count 2 :pos pos})
+                               acc
+                               (conv start-pos range key)))
+
+                           {} converted))))
+; (= 1 count) === part 2, (< 1 count) === part 1
+(count part-1)
+
+
+(def part-2 (vec (filter
+                   (fn [[k {:keys [:count :pos]}]] (< 1 count))
+                   (reduce (fn [acc
+                                {:keys [:key
+                                        :start-pos
+                                        :range]}]
+                             (merge-with
+                               (fn
+                                 [x
+                                  {:keys
+                                   [:pos :count]}]
+                                 {:count 2 :pos pos})
+                               acc
+                               (conv start-pos range key)))
+
+                           {} converted))))
+(def new-map (map (fn [[k {:keys [
+                                  :pos
+                                  :count
+                                  :total]}]]
+                    {:pos pos :axis k :count count :total total}) part-2))
+(def gb (group-by :pos new-map))
+
+(map (fn [[k v]] {k (= (count v) ((get v 0) :total))}) gb)
+;{"#445" true}
+
+;
+;
+;(def part1-result (filter
+;                    (fn [[k v]] (= 1 v))
+;                    (reduce (fn [acc
+;                                 {:keys [:key
+;                                         :start-pos
+;                                         :range]}]
+;                              (merge-with + acc (conv start-pos range key)))
+;                            ;(reduce conj (vec (fill-axis start-pos range))))
+;                            {} converted)))
