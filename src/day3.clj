@@ -80,7 +80,7 @@
                     {:pos pos :axis k :count count :total total}) part-2))
 (def gb (group-by :pos new-map))
 
-(map (fn [[k v]] {k (= (count v) ((get v 0) :total))} gb))
+(map (fn [[k v]] {k (= (count v) ((get v 0) :total))}) gb)
 ;{"#445" true}
 
 ;
